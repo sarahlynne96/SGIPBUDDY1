@@ -1,23 +1,27 @@
-<!-- SGIP Calculator HTML goes here -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>SGIP Eligibility Calculator</title>
-</head>
-<body>
-  <h1>SGIP Calculator (modular)</h1>
-  <form id="sgipForm">
-    <input type="text" id="address" placeholder="Enter project address" required />
-    <input type="number" id="systemSize" placeholder="Battery size (kWh)" />
-    <select id="incomeLevel">
-      <option value="">Income Level</option>
-      <option value="low">Low</option>
-      <option value="moderate">Moderate</option>
-    </select>
-    <button type="submit">Check Eligibility</button>
-  </form>
-  <div id="results"></div>
-  <script type="module" src="./main.js"></script>
-</body>
-</html>
+// Express server scraping selfgenca.com program metrics
+const express = require('express');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const app = express();
+
+app.get('/api/rates', async (req, res) => {
+  try {
+    const { data } = await axios.get('https://www.selfgenca.com/home/program_metrics/');
+    const $ = cheerio.load(data);
+    const table = $('table').first();
+    const rows = [];
+    table.find('tbody tr').each((i, row) => {
+      const cells = $(row).find('td');
+      rows.push({
+        step: $(cells[0]).text().trim(),
+        storage: $(cells[1]).text().trim(),
+        renewableGen: $(cells[2]).text().trim()
+      });
+    });
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Error scraping SGIP rates.' });
+  }
+});
+
+app.listen(3000, () => console.log("SGIP rates API running on port 3000"));
