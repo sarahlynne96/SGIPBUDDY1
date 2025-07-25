@@ -1,0 +1,1 @@
+// eligibility.js - DAC and fire zone logic

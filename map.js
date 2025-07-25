@@ -1,0 +1,1 @@
+// map.js - handles ArcGIS map layers

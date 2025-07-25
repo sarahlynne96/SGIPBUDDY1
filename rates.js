@@ -1,0 +1,1 @@
+// rates.js - fetches live SGIP rates from backend
